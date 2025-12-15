@@ -10,27 +10,43 @@
  * Status: stress-tested
  */
 #pragma once
-
-#include "../data-structures/RMQ.h"
-
-struct LCA {
-	int T = 0;
-	vi time, path, ret;
-	RMQ<int> rmq;
-
-	LCA(vector<vi>& C) : time(sz(C)), rmq((dfs(C,0,-1), ret)) {}
-	void dfs(vector<vi>& C, int v, int par) {
-		time[v] = T++;
-		for (int y : C[v]) if (y != par) {
-			path.push_back(v), ret.push_back(time[v]);
-			dfs(C, y, v);
+// USES Sparse Table 
+struct LCA{
+	int n;
+	SparseTable<int> st;
+	vector<vector<int>> adj;
+	vector<int> d, tour, dep_tour, pos;
+	LCA(int _n){
+		n = _n;
+		adj.resize(n);
+		d.resize(n);
+		pos.resize(n);
+	}
+	void add(int a,int b){
+		adj[a].push_back(b);
+		adj[b].push_back(a);
+	}
+	void dfs(int i,int p){
+		pos[i] = tour.size();
+		tour.push_back(i);
+		dep_tour.push_back(d[tour.back()]);
+		for(int e : adj[i]){
+			if(e != p){
+				d[e] = d[i] + 1;
+				dfs(e, i);
+				tour.push_back(i);
+				dep_tour.push_back(d[tour.back()]);
+			}
 		}
 	}
-
-	int lca(int a, int b) {
-		if (a == b) return a;
-		tie(a, b) = minmax(time[a], time[b]);
-		return path[rmq.query(a, b)];
+	void init(int root){
+		dfs(root, root);
+		st.init(dep_tour);
 	}
-	//dist(a,b){return depth[a] + depth[b] - 2*depth[lca(a,b)];}
+	int lca(int a,int b){
+		a = pos[a];
+		b = pos[b];
+		if(a > b)swap(a,b);
+		return tour[st.index(a, b)];
+	}
 };

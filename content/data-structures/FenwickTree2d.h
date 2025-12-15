@@ -12,25 +12,24 @@
 
 #include "FenwickTree.h"
 
-struct FT2 {
-	vector<vi> ys; vector<FT> ft;
-	FT2(int limx) : ys(limx) {}
-	void fakeUpdate(int x, int y) {
-		for (; x < sz(ys); x |= x + 1) ys[x].push_back(y);
-	}
-	void init() {
-		for (vi& v : ys) sort(all(v)), ft.emplace_back(sz(v));
-	}
-	int ind(int x, int y) {
-		return (int)(lower_bound(all(ys[x]), y) - ys[x].begin()); }
-	void update(int x, int y, ll dif) {
-		for (; x < sz(ys); x |= x + 1)
-			ft[x].update(ind(x, y), dif);
-	}
-	ll query(int x, int y) {
-		ll sum = 0;
-		for (; x; x &= x - 1)
-			sum += ft[x-1].query(ind(x-1, y));
-		return sum;
-	}
+// You can do rectangle queries in 2D array and cuboid queries in 3D array etc
+// For update -> (x_i, y_i, z_i, value) for query -> (left_x, right_x, left_y, right_y, left_z, right_z)
+template <class T, int ...Ns> struct BIT {
+    // It is 0 indexed 
+	T val = 0;
+	void update(T v) { val += v; }
+	T query() { return val; }
 };
+template <class T, int N, int... Ns> struct BIT<T, N, Ns...> {
+	BIT<T,Ns...> bit[N + 1];
+	template<typename... Args> void update(int pos, Args... args) {
+		for (++pos; pos <= N; pos += (pos&-pos)) bit[pos].update(args...);
+	}
+	template<typename... Args> T sum(int r, Args... args) {
+		T res = 0; for (; r; r -= (r&-r)) res += bit[r].query(args...);
+		return res;
+	}
+	template<typename... Args> T query(int l, int r, Args... args) {
+		return sum(r + 1,args...)-sum(l,args...);
+	}
+}; // BIT<int,10,10> gives a 2D BIT}}}

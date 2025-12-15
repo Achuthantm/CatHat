@@ -7,18 +7,28 @@
  * Time: $O(\alpha(N))$
  */
 #pragma once
-
-struct UF {
-	vi e;
-	UF(int n) : e(n, -1) {}
-	bool sameSet(int a, int b) { return find(a) == find(b); }
-	int size(int x) { return -e[find(x)]; }
-	int find(int x) { return e[x] < 0 ? x : e[x] = find(e[x]); }
-	bool join(int a, int b) {
-		a = find(a), b = find(b);
-		if (a == b) return false;
-		if (e[a] > e[b]) swap(a, b);
-		e[a] += e[b]; e[b] = a;
-		return true;
-	}
+struct ufds{
+        int n;
+        vector<int> par, siz;
+        ufds(int _n){
+                n = _n;
+                par.resize(n);
+                iota(par.begin(), par.end(), 0);
+                siz.resize(n, 1);
+        }
+        int f(int i){
+                return (par[i] == i)?i : par[i] = f(par[i]);
+        }
+        bool u(int i,int j){
+                i = f(i);
+                j = f(j);
+                if(i == j)return false;
+                if(siz[i] < siz[j])swap(i, j);
+                siz[i] += siz[j];
+                par[j] = i;
+                return true;
+        }
+        bool same(int a,int b){
+            return f(a) == f(b);
+        }
 };

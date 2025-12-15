@@ -7,48 +7,67 @@
  * Status: stress-tested
  */
 #pragma once
-
-// Arithmetic mod 2^64-1. 2x slower than mod 2^64 and more
-// code, but works on evil test data (e.g. Thue-Morse, where
-// ABBA... and BAAB... of length 2^10 hash the same mod 2^64).
-// "typedef ull H;" instead if you think test data is random,
-// or work mod 10^9+7 if the Birthday paradox is not a problem.
-typedef uint64_t ull;
-struct H {
-	ull x; H(ull x=0) : x(x) {}
-	H operator+(H o) { return x + o.x + (x + o.x < x); }
-	H operator-(H o) { return *this + ~o.x; }
-	H operator*(H o) { auto m = (__uint128_t)x * o.x;
-		return H((ull)m) + (ull)(m >> 64); }
-	ull get() const { return x + !~x; }
-	bool operator==(H o) const { return get() == o.get(); }
-	bool operator<(H o) const { return get() < o.get(); }
-};
-static const H C = (ll)1e11+3; // (order ~ 3e9; random also ok)
-
-struct HashInterval {
-	vector<H> ha, pw;
-	HashInterval(string& str) : ha(sz(str)+1), pw(ha) {
-		pw[0] = 1;
-		rep(i,0,sz(str))
-			ha[i+1] = ha[i] * C + str[i],
-			pw[i+1] = pw[i] * C;
-	}
-	H hashInterval(int a, int b) { // hash [a, b)
-		return ha[b] - ha[a] * pw[b - a];
-	}
-};
-
-vector<H> getHashes(string& str, int length) {
-	if (sz(str) < length) return {};
-	H h = 0, pw = 1;
-	rep(i,0,length)
-		h = h * C + str[i], pw = pw * C;
-	vector<H> ret = {h};
-	rep(i,length,sz(str)) {
-		ret.push_back(h = h * C + str[i] - pw * str[i-length]);
-	}
-	return ret;
+typedef unsigned long long ull;
+ 
+// Generate random base in (before, after) open interval:
+int gen_base(const int before, const int after) {
+    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    std::mt19937 mt_rand(seed);
+    int base = std::uniform_int_distribution<int>(before+1, after)(mt_rand);
+    return base % 2 == 0 ? base-1 : base;
 }
+ 
+struct PolyHash {
+    // -------- Static variables --------
+    static const int mod = (int)1e9+123; // prime mod of polynomial hashing
+    static std::vector<int> pow1;        // powers of base modulo mod
+    static std::vector<ull> pow2;        // powers of base modulo 2^64
+    static int base;                     // base (point of hashing)
+ 
+    // --------- Static functons --------
+    static inline int diff(int a, int b) { 
+    	// Diff between `a` and `b` modulo mod (0 <= a < mod, 0 <= b < mod)
+        return (a -= b) < 0 ? a + mod : a;
+    }
+ 
+    // -------------- Variables of class -------------
+    std::vector<int> pref1; // Hash on prefix modulo mod
+    std::vector<ull> pref2; // Hash on prefix modulo 2^64
+ 
+    // Cunstructor from string:
+    PolyHash(const std::string& s)
+        : pref1(s.size()+1u, 0)
+        , pref2(s.size()+1u, 0)
+    {
+        assert(base < mod);
+        const int n = s.size(); // Firstly calculated needed power of base:
+        while ((int)pow1.size() <= n) {
+            pow1.push_back(1LL * pow1.back() * base % mod);
+            pow2.push_back(pow2.back() * base);
+        }
+        for (int i = 0; i < n; ++i) { // Fill arrays with polynomial hashes on prefix
+            assert(base > s[i]);
+            pref1[i+1] = (pref1[i] + 1LL * s[i] * pow1[i]) % mod;
+            pref2[i+1] = pref2[i] + s[i] * pow2[i];
+        }
+    }
+ 
+    // Polynomial hash of subsequence [pos, pos+len)
+    // If mxPow != 0, value automatically multiply on base in needed power. Finally base ^ mxPow
+    inline std::pair<int, ull> operator()(const int l, const int r, const int mxPow = 0) const {
+        int pos = l, len = r - l + 1;
+        int hash1 = pref1[pos+len] - pref1[pos];
+        ull hash2 = pref2[pos+len] - pref2[pos];
+        if (hash1 < 0) hash1 += mod;
+        if (mxPow != 0) {
+            hash1 = 1LL * hash1 * pow1[mxPow-(pos+len-1)] % mod;
+            hash2 *= pow2[mxPow-(pos+len-1)];
+        }
+        return std::make_pair(hash1, hash2);
+    }
+};
+int PolyHash::base((int)1e9 + 7); //For making it hard to hack set base to gen_base(1e5, 1e9 + 120)
+vector<int> PolyHash::pow1{1};
+vector<ull> PolyHash::pow2{1};
 
-H hashString(string& s){H h{}; for(char c:s) h=h*C+c;return h;}
+// To get hash do polyhash(l, r, max_length)
