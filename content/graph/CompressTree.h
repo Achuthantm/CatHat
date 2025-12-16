@@ -16,9 +16,8 @@
 
 typedef vector<pair<int, int>> vpi;
 vpi compressTree(LCA& lca, const vi& subset) {
-	static vi rev; rev.resize(sz(lca.time));
-	vi li = subset, &T = lca.time;
-	auto cmp = [&](int a, int b) { return T[a] < T[b]; };
+	vi li = subset;
+	auto cmp = [&](int a, int b) { return lca.pos[a] < lca.pos[b]; };
 	sort(all(li), cmp);
 	int m = sz(li)-1;
 	rep(i,0,m) {
@@ -27,6 +26,8 @@ vpi compressTree(LCA& lca, const vi& subset) {
 	}
 	sort(all(li), cmp);
 	li.erase(unique(all(li)), li.end());
+
+	static vi rev; if(rev.size()<lca.pos.size())rev.resize(lca.pos.size());
 	rep(i,0,sz(li)) rev[li[i]] = i;
 	vpi ret = {pii(0, li[0])};
 	rep(i,0,sz(li)-1) {

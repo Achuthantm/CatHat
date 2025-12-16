@@ -13,7 +13,7 @@ ulimit -s 524288 # For 2-sat test
 for test in $tests; do
     echo "$(basename $test): "
     start=`date +%s.%N`
-    g++ -Wall -Wfatal-errors -Wconversion -std=c++17 -O2 $test && ./a.out
+    g++ -Wall -Wfatal-errors -Wconversion -std=c++17 -O2 $test && ./a.exe
     retCode=$?
     if (($retCode != 0)); then
         echo "Failed with $retCode"
@@ -25,7 +25,7 @@ for test in $tests; do
     end=`date +%s.%N`
     runtime=$( echo "$end - $start" | bc -l )
     echo "Took $runtime seconds"
-    rm -f a.out
+    rm -f a.exe
     echo
 done
 echo "$pass/$(($pass+$fail)) tests passed"

@@ -11,6 +11,52 @@
  */
 #pragma once
 // USES Sparse Table 
+
+template <typename T>
+struct SparseTable {
+    int n;
+    vector<vector<int>> st;
+    vector<int> log;
+    vector<T> arr;
+
+    void init(const vector<T>& a) {
+        n = a.size();
+        arr = a;
+        int k = __lg(n) + 1;
+        st.assign(n, vector<int>(k));
+        log.assign(n + 1, 0);
+
+        for (int i = 2; i <= n; i++)
+            log[i] = log[i / 2] + 1;
+
+        for (int i = 0; i < n; i++)
+            st[i][0] = i;
+
+        for (int j = 1; j < k; j++) {
+            for (int i = 0; i + (1 << j) <= n; i++) {
+                int left_idx = st[i][j - 1];
+                int right_idx = st[i + (1 << (j - 1))][j - 1];
+                
+                if (arr[left_idx] < arr[right_idx])
+                    st[i][j] = left_idx;
+                else
+                    st[i][j] = right_idx;
+            }
+        }
+    }
+
+    int index(int L, int R) {
+        int j = log[R - L + 1];
+        int left_idx = st[L][j];
+        int right_idx = st[R - (1 << j) + 1][j];
+
+        if (arr[left_idx] < arr[right_idx])
+            return left_idx;
+        else
+            return right_idx;
+    }
+};
+
 struct LCA{
 	int n;
 	SparseTable<int> st;

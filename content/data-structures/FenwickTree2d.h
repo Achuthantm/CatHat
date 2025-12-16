@@ -14,14 +14,14 @@
 
 // You can do rectangle queries in 2D array and cuboid queries in 3D array etc
 // For update -> (x_i, y_i, z_i, value) for query -> (left_x, right_x, left_y, right_y, left_z, right_z)
-template <class T, int ...Ns> struct BIT {
+template <class T, int ...Ns> struct BITn {
     // It is 0 indexed 
 	T val = 0;
 	void update(T v) { val += v; }
 	T query() { return val; }
 };
-template <class T, int N, int... Ns> struct BIT<T, N, Ns...> {
-	BIT<T,Ns...> bit[N + 1];
+template <class T, int N, int... Ns> struct BITn<T, N, Ns...> {
+	BITn<T,Ns...> bit[N + 1];
 	template<typename... Args> void update(int pos, Args... args) {
 		for (++pos; pos <= N; pos += (pos&-pos)) bit[pos].update(args...);
 	}
