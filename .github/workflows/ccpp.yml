@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Grant execute permission to compile script
-      run: chmod +x ./doc/scripts/compile-all.sh
+      run: chmod +x ./doc/scripts/*.sh
     - name: Install dependencies
       run: sudo apt-get install texlive-latex-base texlive-latex-recommended texlive-latex-extra
     - name: Build pdf
