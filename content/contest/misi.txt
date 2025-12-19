@@ -1,0 +1,26 @@
+// Generater Code 
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+vector<pair<int,int>> get_tree(int n){
+    vector<int> p(n, - 1);
+    for(int i = 1;i<n;i++){
+        p[i] = rng()%i;
+    }
+    vector<int> rr(n);iota(rr.begin(), rr.end(), 0);
+    shuffle(rr.begin(), rr.end(), rng);
+    vector<pair<int,int>> ans;
+    for(int i = 1;i<n;i++){
+        ans.push_back({rr[i], rr[p[i]]});
+    }
+    return ans;
+}
+
+// VSCODE Build system - tasks.json
+{
+  "tasks": [
+	{
+		"label": "Build and Run",
+		"type": "shell",
+		"command": "g++-15 -Wall -Wextra -DDEBUG ${file} -o ${fileDirname}/${fileBasenameNoExtension} && ${fileDirname}/${fileBasenameNoExtension} < ${fileDirname}/input.txt > ${fileDirname}/output.txt", 
+	}
+]
+}
