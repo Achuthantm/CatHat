@@ -10,6 +10,7 @@
  * Status: stress-tested
  */
 #pragma once
+#include "../data-structures/RMQ.h"
 // USES Sparse Table 
 struct LCA{
 	int n;
