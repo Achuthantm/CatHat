@@ -1,9 +1,4 @@
 #include <bits/stdc++.h>
-#ifdef DEBUG
-#include "debug.h"
-#else 
-#define deb(x...)
-#endif
 using namespace std;
 
 #define rep(i, a, b) for(int i = a; i < (b); ++i)
