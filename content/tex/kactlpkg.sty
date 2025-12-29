@@ -57,9 +57,9 @@
 
 \renewcommand{\maketitle}[2]{
 	\begin{center}
-		{\Huge \@title}\\
-		{\huge \@subtitle{} version #2}\\[0.1cm]
-		{\Huge \textsc{#1}}
+		{\small \@title}\\
+		{\small \@subtitle{} version #2}\\[0.1cm]
+		{\small \textsc{#1}}
 	\end{center}
 }
 
@@ -122,27 +122,27 @@
 
 	\parindent \z@ \raggedright \normalfont
 		\interlinepenalty\@M
-	{\underline{\huge \bfseries #1} }
+	{\underline{\small \bfseries #1} }
 	\ifnum \c@secnumdepth >\m@ne
-		{\huge\bfseries (\thechapter) \par\nobreak }
+		{\small\bfseries (\thechapter) \par\nobreak }
 	\fi
 	\startcontents[chapters]
 }
 
 \renewcommand\section{\@startsection {section}{1}{\z@}%
-                                   {-0.5ex \@plus -1ex \@minus -.2ex}%
-                                   {.4ex}%
-                                   {\normalfont\LARGE\bfseries}}
+                                   {-0.2ex \@plus -0.5ex \@minus -.1ex}% % Reduced from -0.5ex
+                                   {0.1ex}%                             % Reduced from 0.4ex
+                                   {\normalfont\small\bfseries}}
 
 \renewcommand\subsection{\@startsection{subsection}{2}{\z@}
-	{1ex\@plus -1ex \@minus -.3ex}
-	{.2ex}
-	{\normalfont\large\bfseries}}
+    {0.2ex\@plus -0.5ex \@minus -.1ex}                                % Reduced from 1ex
+    {0.1ex}                                                           % Reduced from 0.2ex
+    {\normalfont\small\bfseries}}
 
 \renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}
-	{1ex\@plus -1ex \@minus -.3ex}
-	{1ex \@plus .2ex}
-	{\normalfont\large\bfseries}}
+    {0.2ex\@plus -0.5ex \@minus -.1ex}                                % Reduced from 1ex
+    {0.1ex}                                                           % Reduced from 1ex
+    {\normalfont\small\bfseries}}
 
 % Styles for local toc
 \titlecontents{localsection}[1.5em]{\small}{}
@@ -155,7 +155,7 @@
 \renewcommand{\cftbeforetoctitleskip}{-45pt}
 \renewcommand{\cftaftertoctitleskip}{10pt}
 \renewcommand{\cftbeforechapskip}{11pt}
-\renewcommand\cftchapfont{\large\bfseries}
+\renewcommand\cftchapfont{\small\bfseries}
 \renewcommand{\cftdotsep}{4.5}
 
 % Proper carets and tildes
@@ -204,8 +204,8 @@
 \lstset{literate={^}{\caret}{1} {~}{\tilde}{1} {\{}{\nicelbrace}{1} {\}}{\nicerbrace}{1}}
 \lstset{emptylines=*1}
 \lstset{inputencoding=utf8}
-\lstset{aboveskip=3pt}
-\lstset{belowskip=2pt}
+\lstset{aboveskip=0pt}
+\lstset{belowskip=0pt}
 
 \lstdefinelanguage{raw}{} % Raw language, no keywords.
 
@@ -267,7 +267,7 @@
 	\setboolean{hasleftcaption}{false}
 	\myneedspace{3\baselineskip}
 	\penalty-100
-	{\large #2}
+	{\small#2}
 	\immediate\write18{rm -f \@builddir/kactl.tmp} % Don't include old kactl.tmp on failure.
 	\immediate\write18{python3 content/tex/preprocessor.py -i "\@kactldir/#2" -o \@builddir/kactl.tmp #1}
 	\immediate\input{\@builddir/kactl.tmp}
